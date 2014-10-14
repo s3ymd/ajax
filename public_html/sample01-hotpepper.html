@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Ajaxサンプル</title>
+        <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.css">
+    </head>
+    <body>
+        <div data-role="content">
+            <form>
+                <label for="keywordText">キーワード(居酒屋、レストラン、カフェなど)</label>
+                <input type="text" id="keywordText" value="居酒屋">
+
+                <label for="areaText">地域(東京、台東区、秋葉原など)</label>
+                <input type="text" id="areaText" value="秋葉原">
+
+                <input type="button" id="searchButton" value="検索">
+            </form>
+        </div>
+        <div id="result">（ここに結果が表示されます）</div>
+        
+        <!-- ホットペッパー Webサービスの提供するAPIを利用するすべてのサイトやアプリケーションには、以下のクレジットを表示してください。 -->
+        <a href="http://webservice.recruit.co.jp/"><img src="http://webservice.recruit.co.jp/banner/hotpepper-m.gif" alt="ホットペッパー Webサービス" width="88" height="35" border="0" title="ホットペッパー Webサービス"></a>
+
+        <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="https://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.js"></script>
+        <script>
+            $(function() {
+                $("#searchButton").click(function() {
+                    // グルメサーチAPI
+                    // http://webservice.recruit.co.jp/hotpepper/reference.html
+                    var serviceUrl = "http://webservice.recruit.co.jp/hotpepper/gourmet/v1/";
+
+                    // APIキー: 本研修以外での使用を禁じます。
+                    // 下記サイトより各自取得してください
+                    // https://webservice.recruit.co.jp/register/index.html
+                    var key = "146bb001ecbb6058";
+
+                    // 検索キーワード: キーワードと地域を半角スペースで結合
+                    var keyword = $("#keywordText").val() + " " + $("#areaText").val();
+
+                    // グルメサーチAPI用パラメータ
+                    var parameter = {key: key, keyword: keyword, format: "jsonp"};
+
+                    // Ajaxを使用して店舗情報を取得
+                    $.ajax({
+                        url: serviceUrl,
+                        data: parameter,
+                        dataType: "jsonp"
+                    })
+                            .done(function(data) {
+                                var shops = data.results.results_returned;
+                                // 店舗情報をテーブルで表示
+                                var s = "<table border='1'>";
+                                for (var i = 0; i < shops; i++) {
+                                    var shop = data.results.shop[i];
+                                    s += "<tr>";
+                                    s += "<td><img src='" + shop.logo_image + "'></td>";
+                                    s += "<td>" + shop.name + "</td>";
+                                    s += "<td>" + shop.address + "</td>";
+                                    s += "<td>" + shop.catch + "</td>";
+                                    s += "</tr>";
+                                }
+                                s += "</table>";
+                                $("#result").html(s);
+                            });
+                });
+            });
+        </script>
+
+    </body>
+</html>
